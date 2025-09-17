@@ -1,0 +1,65 @@
+---
+title: "Lab2"
+author: "Nasrin Khanam"
+date: "2025-09-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+
+setwd("/Users/nasrinkhanam/Downloads")
+unzip("d_HHP2020_24.zip")
+load("d_HHP2020_24.Rdata")
+```
+
+
+
+## Marital Status by Age Group
+```{r}
+d_HHP2020_24 <- d_HHP2020_24 %>%
+  mutate(Age_group = cut(Age,
+                         breaks = c(-Inf, 24, 29, 34, 39, 44, 49, 59, 69, Inf),
+                         labels = c("<=24","25-29","30-34","35-39",
+                                    "40-44","45-49","50-59","60-69","70+")))
+
+ggplot(d_HHP2020_24, aes(x = Age_group, fill = Mar_Stat)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Marital Status by Age Group",
+       y = "Count", x = "Age Group") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+# Marital Status by Age Groups (Selected Ranges)
+
+d_HHP2020_24 <- d_HHP2020_24 %>%
+  mutate(Age_group = cut(Age,
+                         breaks = c(-Inf, 24, 29, 34, 39, 44, 49, 59, 69, Inf),
+                         labels = c("<=24","25-29","30-34","35-39",
+                                    "40-44","45-49","50-59","60-69","70+")))
+
+# Define function filters
+plot_age_group <- function(data, group_label) {
+  df <- data %>% filter(Age_group == group_label,
+                        Gender %in% c("male","female"),
+                        Mar_Stat %in% c("Married","never","divorced"))
+  
+  ggplot(df, aes(x = Gender, fill = Mar_Stat)) +
+    geom_bar(position = "dodge") +
+    labs(title = paste("Marital Status for Age Group", group_label),
+         x = "Gender", y = "Count") +
+    theme_minimal()
+}
+
+# Plots for each chosen age group
+plot_age_group(d_HHP2020_24, "25-29")
+plot_age_group(d_HHP2020_24, "35-39")
+plot_age_group(d_HHP2020_24, "45-49")
+plot_age_group(d_HHP2020_24, "50-59")
+plot_age_group(d_HHP2020_24, "70+")
+
+```
